@@ -30,20 +30,28 @@ void multiply_matrix(FILE* A, FILE* B, FILE* C, int col_A, int row_B, int row_A,
 void get_dim(FILE* file, int* col, int* row){
     char* first_line = NULL;
     size_t size = MAX_LINE_LEN;
-    *(col) = 0;
-    *(row) = 1;
+    (*col) = 0;
+    (*row) = 1;
     int r_val = getline(&first_line, &size, file);
     if(r_val == -1){
         free(first_line);
         return;
     }
     int i = 0;
+    int j = 0;
+
+    while(*(first_line + i) == 32){ //strip off leading spaces
+        i++;
+    }
+
     while(*(first_line + i) != '\0') {
-        if(*(first_line + i) == ' ') {
+        if(*(first_line + i) == ' ' && (*(first_line + i + 1) != ' ' && *(first_line + i + 1) != '\0' && *(first_line + i + 1) != '\n')){
             (*col)++;
         }
         i++;
     }
+
+    (*col)++;
 
     while(getline(&first_line, &size, file) != -1) {
         (*row)++;
@@ -70,6 +78,7 @@ int main(int argc, char** argv){
     get_dim(file_B, &col_B, &row_B);
 
     if(col_A != row_B){
+        //printf("%d %d", col_A, col_B);
         printf("Cannot multiply matrices - mismatching dimensions.");
         fclose(file_A);
         fclose(file_B);
