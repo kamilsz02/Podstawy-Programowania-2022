@@ -112,6 +112,48 @@ void Lesson_toString_test() {
     free(term); 
 }
 
+void zad3_test() {
+    char** argv = malloc(4 * sizeof(char*));
+    argv[0] = "d+";
+    argv[1] = "d+";
+    argv[2] = "d+";
+    argv[3] = "t-";
+    int len;
+    Lesson* les = Lesson_create(12, 50, 90, WED, "Podstawy Programowania");
+    Action* actions = parse(4, argv, &len);
+    for(int i = 0; i < len; i++) {
+        Action el = actions[i];
+        switch (el)
+        {
+        case DAY_EARLIER:
+            Lesson__earlierDay(les);
+            break;
+        case DAY_LATER:
+            Lesson__laterDay(les);
+            break;
+        case TIME_EARLIER:
+            Lesson__earlierTime(les);
+            break;
+        case TIME_LATER:
+            Lesson__laterTime(les);
+            break;
+        default:
+            break;
+        }
+    }
+
+    Lesson* ex = Lesson_create(11, 20, 90, FRI, "Podstawy Programowania");
+    CU_ASSERT_EQUAL(les->name, ex->name);
+    CU_ASSERT_EQUAL(les->term->day, ex->term->day);
+    CU_ASSERT_EQUAL(les->term->hour, ex->term->hour);
+    CU_ASSERT_EQUAL(les->term->minute, ex->term->minute);
+    CU_ASSERT_EQUAL(les->term->duration, ex->term->duration);
+
+    free(argv);
+    free(ex);
+    free(les);
+    free(actions); 
+}
 
 int main()
 {
@@ -170,6 +212,12 @@ int main()
     CU_cleanup_registry();
     return CU_get_error();
   }
+
+  if (NULL == CU_add_test(pSuite, "zad3_test", zad3_test))
+  {
+    CU_cleanup_registry();
+    return CU_get_error();
+  }  
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 
