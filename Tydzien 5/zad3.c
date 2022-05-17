@@ -161,7 +161,11 @@ void Term__destroy(Term* term) {
 }
 
 bool check_bounds(Term* term) {
-    return (bounds[(int)(term->day)]->s_hour <= term->hour && bounds[(int)(term->day)]->f_hour >= term->hour) ? true : false;
+    int dt_start_day = bounds[term->day]->s_hour * 60 + bounds[term->day]->s_min;
+    int dt_fin_day = bounds[term->day]->f_hour * 60 + bounds[term->day]->f_min;
+    int dt_start_les = term->hour * 60 + term->minute;
+    int dt_fin_les = term->hour * 60 + term->minute + term->duration;
+    return dt_start_les >= dt_start_day && dt_fin_les <= dt_fin_day;
 }
 
 void Lesson_init(Lesson* les, int hour, int minute, int duration, Day day, char* name) {
@@ -250,8 +254,9 @@ char* Lesson__toString(Lesson* lesson) {
 }
 
 int main(int argc, char** argv) {
+    // Shifting the start of the lesson is only possible in the scope of one day / Shifting the day of the lesson is only possible in the same week
     make_bounds();
-    Lesson* les = Lesson_create(12, 50, 90, WED, "Podstawy programowania");
+    Lesson* les = Lesson_create(12, 50, 90, WED, "Podstawy Programowania");
     printf("Przed uwzglednieniem przesuniec\n");
     printf("\t%s\n", Lesson__toString(les));
     int len;
