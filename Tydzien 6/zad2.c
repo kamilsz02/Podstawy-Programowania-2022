@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 enum Day{
     MON,
@@ -86,6 +87,10 @@ bool Lesson_Equals(Lesson lesson1, Lesson lesson2) {
 }
 
 void List_Remove(List* list, Lesson lesson) {
+    if(list == NULL) {
+        fprintf(stderr, "Lista nie istnieje\n");
+        exit(EXIT_FAILURE);
+    }
     Node* cur = list->head;
     if(Lesson_Equals(cur->lesson, lesson)) {
         list->head = list->head->next;
@@ -102,6 +107,73 @@ void List_Remove(List* list, Lesson lesson) {
     }
     prev->next = cur->next;
     free(cur);
+}
+
+char* Day_toString(Day day) {
+    char* res = malloc(16 * sizeof(char)); 
+    switch(day) {
+        case MON:
+            strncpy(res, "Poniedzialek", 16);
+            return res;
+        case TUE:
+            strncpy(res, "Wtorek", 16);
+            return res;
+        case WED:
+            strncpy(res, "Sroda", 16);
+            return res;
+        case THU:
+            strncpy(res, "Czwartek", 16);
+            return res;
+        case FRI:
+            strncpy(res, "Piatek", 16);
+            return res;
+        case SAT:
+            strncpy(res, "Sobota", 16);
+            return res;
+        case SUN:
+            strncpy(res, "Niedziela", 16);
+            return res;
+        default:
+            strncpy(res, "Invalid arg", 16);
+            return res;
+    }
+}
+
+char* Lesson__toString(Lesson lesson) {
+    char* res = malloc(128 * sizeof(char));
+    char* day_name = Day_toString(lesson.day);
+    sprintf(res, "\"%s, %s %d:%d [%d]\"", lesson.name, day_name, lesson.hour, lesson.minute, lesson.duration);
+    free(day_name);
+    return res;
+}
+
+void List_Print(List* list) {
+    if(list == NULL) {
+        fprintf(stderr, "Lista nie istnieje\n");
+        exit(EXIT_FAILURE);
+    }
+    char* out = NULL;
+    for(Node* cur = list->head; cur != NULL; cur = cur->next) {
+        out = Lesson__toString(cur->lesson);
+        printf("%s\n", out);
+        free(out);
+    }
+}
+
+void List_Destroy(List** list) {
+    if(*list == NULL) {
+        fprintf(stderr, "Lista nie istnieje\n");
+        exit(EXIT_FAILURE);
+    }
+    Node* cur = (*list)->head;
+    Node* prev = NULL;
+    while(cur != NULL) {
+        prev = cur;
+        free(prev);
+        cur = cur->next;
+    }
+    free(*list);
+    *list = NULL;
 }
 
 int main() {
@@ -130,14 +202,14 @@ int main() {
     lesson3.duration = 90;
 
     List_Insert(list, lesson1, true);
-    printf("%s %d\n", list->head->lesson.name, list->head->lesson.hour);
     List_Insert(list, lesson2, false);
-    printf("%s %d\n", list->head->next->lesson.name, list->head->next->lesson.hour);
     List_Insert(list, lesson3, false);
-    printf("%s %d\n", list->head->next->next->lesson.name, list->head->next->next->lesson.hour);
-    List_Remove(list, lesson2);
-    printf("%s %d\n", list->head->next->lesson.name, list->head->next->lesson.hour);
-    
+    List_Print(list);
+    List_Remove(list, lesson1);
+    List_Print(list);
+    List_Destroy(&list);
+    List_Print(list);
+
     return 0;
 }
 
